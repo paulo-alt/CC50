@@ -1,0 +1,444 @@
+{
+  "name": "Whatsap",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "webhook",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a27e872c-dc9d-447d-baa8-cc3ae339c382",
+      "name": "Webhook",
+      "webhookId": "df00bb85-1f92-45bd-bf45-74f52cce2271"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "234c0496-52bf-42d7-b307-1ca6270217aa",
+              "name": "session",
+              "value": "={{ $json.body.session }}",
+              "type": "string"
+            },
+            {
+              "id": "1f301c60-2c46-40a5-8e1c-d6195c850758",
+              "name": "chatld",
+              "value": "={{ $json.body.payload.from }}",
+              "type": "string"
+            },
+            {
+              "id": "e50b621a-666d-4a52-8995-481f50b3a91b",
+              "name": "pushName",
+              "value": "={{ $json.body.payload._data.Info.PushName }}",
+              "type": "string"
+            },
+            {
+              "id": "e892ea80-8d5f-4adf-8417-319154d8c359",
+              "name": "payload_id",
+              "value": "={{ $json.body.payload.id }}",
+              "type": "string"
+            },
+            {
+              "id": "a5771fa8-9289-43b4-9c46-7c53c5c72132",
+              "name": "event",
+              "value": "={{ $json.body.event }}",
+              "type": "string"
+            },
+            {
+              "id": "c5941e44-7562-4541-8999-af96d971b760",
+              "name": "message",
+              "value": "={{ $json.body.payload.body }}",
+              "type": "string"
+            },
+            {
+              "id": "c31b4f7c-6c19-46a1-afed-c4f831c4c35a",
+              "name": "fromMe",
+              "value": "={{ $json.body.payload.fromMe }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "e841cfd3-ae92-4283-be7b-e24415d26847",
+      "name": "Dados"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.event }}",
+                    "rightValue": "message",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "654ae497-7a57-4243-af81-a07b0387ec71"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "85e8cc45-1f2d-4ed9-8571-fd0a37749d9a",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message }}",
+        "options": {
+          "systemMessage": "Você é um assistente digital da Simplora, um desenvolvedor que oferece soluções digitais acessíveis para pequenos negócios, autônomos e empreendedores. Seu papel é explicar os serviços de forma simples, clara e direta, ajudando o cliente a entender o que ele precisa e como podemos resolver o problema dele.\n\nSeja amigável, profissional e objetivo. Evite linguagem técnica. Sempre mostre os benefícios de forma prática. Apresente os pacotes disponíveis quando fizer sentido, e pergunte se o cliente quer um orçamento personalizado.\n\nServiços oferecidos:\n- Criação de sites simples (Vitrine Digital)\n- Cardápio digital com QR Code (Menu Inteligente)\n- Automação com bots ou scripts (Automação Inteligente)\n- Formulários com planilhas automatizadas (Coleta Inteligente)\n- Scripts sob medida para tarefas específicas (Solução Expressa)\n\nSe o cliente contar um problema, tente sugerir o pacote mais adequado.\n\nExemplos de tom de voz:\n- \"Legal! Posso montar um formulário automático que vai organizar tudo pra você.\"\n- \"Esse tipo de tarefa pode ser resolvido com um script simples. Posso te mostrar como funciona.\"\n\nSeja direto e acolhedor. Seu objetivo é facilitar a vida do cliente com tecnologia simples e útil.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "7277480c-2fb0-4dbd-9a92-f1921b33c012",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        496,
+        208
+      ],
+      "id": "b269166d-425e-4653-8496-2fb698a56eed",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "jE0hy0RBa4pDCp0A",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Dados').item.json.chatld }}",
+        "sessionTTL": 3600,
+        "contextWindowLength": 18
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.5,
+      "position": [
+        640,
+        208
+      ],
+      "id": "5edc69a9-5dd6-46a4-b36d-120332f2768f",
+      "name": "Redis Chat Memory",
+      "credentials": {
+        "redis": {
+          "id": "3lrilvt6xqbPhaQQ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Send Seen",
+        "session": "={{ $('Dados').item.json.session }}",
+        "chatId": "={{ $('Dados').item.json.chatld }}",
+        "messageId": "={{ $('Dados').item.json.payload_id }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-waha.WAHA",
+      "typeVersion": 202411,
+      "position": [
+        976,
+        0
+      ],
+      "id": "20d1061c-5bce-482e-899d-e0e8314c0114",
+      "name": "Send Seen",
+      "credentials": {
+        "wahaApi": {
+          "id": "tgSbDU5MdIF1ROUM",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Send Text",
+        "session": "={{ $('Dados').item.json.session }}",
+        "chatId": "={{ $('Dados').item.json.chatld }}",
+        "text": "={{ $('AI Agent').item.json.output }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-waha.WAHA",
+      "typeVersion": 202411,
+      "position": [
+        1184,
+        0
+      ],
+      "id": "d242d86b-683a-4619-927a-87c89b6020b3",
+      "name": "Send a text message",
+      "credentials": {
+        "wahaApi": {
+          "id": "tgSbDU5MdIF1ROUM",
+          "name": "WAHA account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "accept": "application/json, text/plain, */*",
+            "content-type": "application/json",
+            "user-agent": "WAHA/2025.7.11",
+            "x-webhook-request-id": "01K1VPFM4QWCC8M93NVTAB1PZJ",
+            "x-webhook-timestamp": "1754349949079",
+            "content-length": "2182",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "host": "host.docker.internal:5678",
+            "connection": "keep-alive"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "id": "evt_01k1vpfm4p2nrqwstd6sxpkmh7",
+            "timestamp": 1754349949079,
+            "event": "message",
+            "session": "default",
+            "metadata": {},
+            "me": {
+              "id": "5524981292986@c.us",
+              "pushName": "Simplora",
+              "jid": "5524981292986:21@s.whatsapp.net"
+            },
+            "payload": {
+              "id": "false_120363148311805430@g.us_BB05B88C1CD8B1AC3F9FFBEF65557D68_5524992591874@c.us",
+              "timestamp": 1754349943,
+              "from": "120363148311805430@g.us",
+              "fromMe": false,
+              "source": "app",
+              "body": "Boa noite \nAlguém indo pra Pinheiral agora?",
+              "to": "5524992591874@c.us",
+              "participant": "5524992591874@c.us",
+              "hasMedia": false,
+              "media": null,
+              "ack": 2,
+              "ackName": "DEVICE",
+              "replyTo": null,
+              "_data": {
+                "Info": {
+                  "Chat": "120363148311805430@g.us",
+                  "Sender": "5524992591874@s.whatsapp.net",
+                  "IsFromMe": false,
+                  "IsGroup": true,
+                  "AddressingMode": "pn",
+                  "SenderAlt": "238881819635948@lid",
+                  "RecipientAlt": "",
+                  "BroadcastListOwner": "",
+                  "ID": "BB05B88C1CD8B1AC3F9FFBEF65557D68",
+                  "ServerID": 0,
+                  "Type": "text",
+                  "PushName": "Sulamita",
+                  "Timestamp": "2025-08-04T23:25:43Z",
+                  "Category": "",
+                  "Multicast": false,
+                  "MediaType": "",
+                  "Edit": "",
+                  "MsgBotInfo": {
+                    "EditType": "",
+                    "EditTargetID": "",
+                    "EditSenderTimestampMS": "0001-01-01T00:00:00Z"
+                  },
+                  "MsgMetaInfo": {
+                    "TargetID": "",
+                    "TargetSender": "",
+                    "TargetChat": "",
+                    "DeprecatedLIDSession": null,
+                    "ThreadMessageID": "",
+                    "ThreadMessageSenderJID": ""
+                  },
+                  "VerifiedName": {
+                    "Certificate": {
+                      "details": "CNTa876qhc/LUxIGc21iOndhIghTdWxhbWl0YQ==",
+                      "signature": "H80UUxbF9YOKB/BMLkUFNCLVbd4Qu6a1hL0V6SPNikzDkFOselRVGYxCa5/L71dfQys5Ldj2lum3Eqc/D0y4BA=="
+                    },
+                    "Details": {
+                      "serial": 6023349180533894000,
+                      "issuer": "smb:wa",
+                      "verifiedName": "Sulamita"
+                    }
+                  },
+                  "DeviceSentMeta": null
+                },
+                "Message": {
+                  "conversation": "Boa noite \nAlguém indo pra Pinheiral agora?",
+                  "messageContextInfo": {
+                    "messageSecret": "0QKw/ayCeY2ODpr3UCvsTJ0aHuch/SML6yxvUPEb1aQ="
+                  }
+                },
+                "IsEphemeral": false,
+                "IsViewOnce": false,
+                "IsViewOnceV2": false,
+                "IsViewOnceV2Extension": false,
+                "IsDocumentWithCaption": false,
+                "IsLottieSticker": false,
+                "IsEdit": false,
+                "SourceWebMsg": null,
+                "UnavailableRequestID": "",
+                "RetryCount": 0,
+                "NewsletterMeta": null,
+                "RawMessage": {
+                  "conversation": "Boa noite \nAlguém indo pra Pinheiral agora?",
+                  "messageContextInfo": {
+                    "messageSecret": "0QKw/ayCeY2ODpr3UCvsTJ0aHuch/SML6yxvUPEb1aQ="
+                  }
+                },
+                "Status": 3
+              }
+            },
+            "environment": {
+              "version": "2025.7.11",
+              "engine": "GOWS",
+              "tier": "CORE",
+              "browser": null
+            }
+          },
+          "webhookUrl": "http://host.docker.internal:5678/webhook-test/webhook",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dados": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send Seen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Seen": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "786adb1d-8c6f-4923-8993-cfabb45fe62a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c2390d904e63a8a20234a75a5700ddacbd0a906c2cf0b9d802964f65510b2616"
+  },
+  "id": "lEHUfmzFRSQUicLU",
+  "tags": []
+}
